@@ -68,7 +68,7 @@ namespace CB.MvcMenus
             _FunctionsProviderControllerInfos.Add(new MenusProviderControllerInfo(typeof (TController), method, menuInformation));
         }
 
-        private static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(WebViewPage page)
+        public static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(ControllerContext controllerContext, UrlHelper urlHelper)
         {
             //key is the parent menu name key
             var groupsMenus = new Dictionary<string, List<MenusProviderMetadata>>();
@@ -84,7 +84,7 @@ namespace CB.MvcMenus
                 }
                 else
                 {
-                    var authorizationContext = new AuthorizationContext(page.ViewContext, controller.ActionDescriptor);
+                    var authorizationContext = new AuthorizationContext(controllerContext, controller.ActionDescriptor);
                     foreach (var filterAttribute in controller.UnionAuthorizationFilters)
                     {
                         filterAttribute.OnAuthorization(authorizationContext);
@@ -108,7 +108,7 @@ namespace CB.MvcMenus
                 };
                 if (controller.ActionDescriptor != null)
                 {
-                    metadata.ActionUrl = page.Url.Action(controller.ActionDescriptor.ActionName,
+                    metadata.ActionUrl = urlHelper.Action(controller.ActionDescriptor.ActionName,
                         controller.ControllerDescriptor.ControllerName, controller.Attribute.ActionRouteValues);
                 }
                 if (!groupsMenus.ContainsKey(controller.Attribute.ParentMenuNameKey))
@@ -129,6 +129,16 @@ namespace CB.MvcMenus
                 }
             }
             return result;
+        }
+
+        public static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(this WebViewPage page)
+        {
+            return GetAllMenuMetadatas(page.ViewContext, page.Url);
+        }
+
+        public static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(this Controller controller)
+        {
+            return GetAllMenuMetadatas(controller.ControllerContext, controller.Url);
         }
 
         /// <summary>
@@ -179,7 +189,7 @@ namespace CB.MvcMenus
         {
             return new HelperResult(tw =>
             {
-                var menus = GetAllMenuMetadatas(page);
+                var menus = GetAllMenuMetadatas(page.ViewContext, page.Url);
                 foreach (var menu in menus)
                 {
                     tw.Write(new HtmlString(RenderMenu(menu, generateMenuFunc)));
