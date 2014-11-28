@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
+using Microsoft.Owin;
 
 namespace CB.MvcMenus
 {
@@ -51,8 +52,24 @@ namespace CB.MvcMenus
             }
         }
 
+        private static List<MenusProviderControllerInfo> GetFunctionsProviderControllerInfosOfRequest(IOwinContext context)
+        {
+            object obj;
+            List<MenusProviderControllerInfo> infos;
+            if (!context.Environment.TryGetValue("CB.MvcMenus.FunctionsProviderControllerInfos", out obj))
+            {
+                infos = new List<MenusProviderControllerInfo>();
+                context.Environment["CB.MvcMenus.FunctionsProviderControllerInfos"] = infos;
+            }
+            else
+            {
+                infos = (List<MenusProviderControllerInfo>) obj;
+            }
+            return infos;
+        }
+
         /// <summary>
-        /// 
+        /// Add menus as global static
         /// </summary>
         /// <typeparam name="TController"></typeparam>
         /// <param name="actionExpression">is the expression that call the action of the controller, for example controller=>controller.Index() </param>
@@ -68,11 +85,29 @@ namespace CB.MvcMenus
             _FunctionsProviderControllerInfos.Add(new MenusProviderControllerInfo(typeof (TController), method, menuInformation));
         }
 
+        /// <summary>
+        /// Add menu for this request
+        /// </summary>
+        /// <typeparam name="TController"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="actionExpression"></param>
+        /// <param name="menuInformation"></param>
+        public static void AddMenuInfo<TController>(this IOwinContext context, Expression<Action<TController>> actionExpression, IMenuInformation menuInformation) where TController : Controller
+        {
+            MethodInfo method = null;
+            if (actionExpression != null)
+            {
+                method = ((MethodCallExpression)actionExpression.Body).Method;
+            }
+
+            GetFunctionsProviderControllerInfosOfRequest(context).Add(new MenusProviderControllerInfo(typeof(TController), method, menuInformation));
+        }
+
         public static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(ControllerContext controllerContext, UrlHelper urlHelper)
         {
             //key is the parent menu name key
             var groupsMenus = new Dictionary<string, List<MenusProviderMetadata>>();
-            foreach (var controller in _FunctionsProviderControllerInfos)
+            foreach (var controller in _FunctionsProviderControllerInfos.Union(GetFunctionsProviderControllerInfosOfRequest(HttpContext.Current.GetOwinContext())))
             {
                 var authorized = true;
 
