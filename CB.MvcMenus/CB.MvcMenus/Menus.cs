@@ -17,10 +17,10 @@ namespace CB.MvcMenus
         private static List<MenusProviderControllerInfo> _FunctionsProviderControllerInfos;
 
         /// <summary>
-        /// should be called before invoke RenderMenus, just call one time
+        /// should be called before invoke RenderMenus, just call one time, only get static menus
         /// </summary>
         /// <param name="assemblies"></param>
-        public static void FindAllMenus(params Assembly[] assemblies)
+        public static void FindAllMenusFromAttribute(params Assembly[] assemblies)
         {
             var controllers = (from t in assemblies.SelectMany(a => a.GetTypes())
                               where t.IsSubclassOf(typeof(Controller))
@@ -103,6 +103,12 @@ namespace CB.MvcMenus
             GetFunctionsProviderControllerInfosOfRequest(context).Add(new MenusProviderControllerInfo(typeof(TController), method, menuInformation));
         }
 
+        /// <summary>
+        /// get not only static global menus, but also get the menus registed for one request
+        /// </summary>
+        /// <param name="controllerContext"></param>
+        /// <param name="urlHelper"></param>
+        /// <returns></returns>
         public static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(ControllerContext controllerContext, UrlHelper urlHelper)
         {
             //key is the parent menu name key
@@ -174,6 +180,25 @@ namespace CB.MvcMenus
         public static IEnumerable<MenusProviderMetadata> GetAllMenuMetadatas(this Controller controller)
         {
             return GetAllMenuMetadatas(controller.ControllerContext, controller.Url);
+        }
+
+        public static IEnumerable<MenusProviderMetadata> FindMenuMetadatasByUrl(this IEnumerable<MenusProviderMetadata> allMenus, string url)
+        {
+            url = url.ToLowerInvariant();
+            foreach (var menu in allMenus)
+            {
+                if (menu.ActionUrl.ToLowerInvariant() == url)
+                {
+                    yield return menu;
+                }
+                if (menu.ChildrenMenus.Count > 0)
+                {
+                    foreach (var subMenu in FindMenuMetadatasByUrl(menu.ChildrenMenus, url))
+                    {
+                        yield return subMenu;
+                    }
+                }
+            }
         }
 
         /// <summary>
