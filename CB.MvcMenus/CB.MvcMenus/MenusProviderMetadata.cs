@@ -14,6 +14,7 @@ namespace CB.MvcMenus
         public string ActionUrl { get; set; }
         public IEMode IEMode { get; set; }
         internal int Order { get; set; }
+        public string Title { get; set; }
 
         public List<MenusProviderMetadata> ChildrenMenus { get; private set; }
     }

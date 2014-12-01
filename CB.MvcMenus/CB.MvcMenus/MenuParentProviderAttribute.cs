@@ -7,7 +7,7 @@ namespace CB.MvcMenus
     {
         public MenuParentProviderAttribute(string nameKey)
         {
-            NameKey = nameKey;
+            Title = NameKey = nameKey;
             Order = 0;
             IEMode = IEMode.Edge;
             ParentMenuNameKey = string.Empty;
@@ -21,6 +21,7 @@ namespace CB.MvcMenus
         public string IconCSS { get; set; }
         public int Order { get; set; }
         public IEMode IEMode { get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// if provide, then the values will be passed to the action of controller

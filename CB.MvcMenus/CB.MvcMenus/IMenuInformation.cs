@@ -11,6 +11,7 @@
         int Order { get; set; }
         string ParentMenuNameKey { get; set; }
         IEMode IEMode { get; set; }
+        string Title { get; set; }
 
         /// <summary>
         /// if provide, then the values will be passed to the action of controller

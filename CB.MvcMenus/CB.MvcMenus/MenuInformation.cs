@@ -4,7 +4,7 @@
     {
         public MenuInformation(string nameKey)
         {
-            NameKey = nameKey;
+            Title = NameKey = nameKey;
         }
 
         #region Implementation of IMenuInformation
@@ -17,6 +17,7 @@
         public int Order { get; set; }
         public string ParentMenuNameKey { get; set; }
         public IEMode IEMode { get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// if provide, then the values will be passed to the action of controller

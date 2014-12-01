@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.UI.WebControls;
 
 namespace CB.MvcMenus
 {
@@ -18,10 +19,11 @@ namespace CB.MvcMenus
         /// </summary>
         object IMenuInformation.ActionRouteValues { get; set; }
         public string ParentMenuNameKey { get; set; }
+        public string Title { get; set; }
 
         public MenusProviderAttribute(string nameKey)
         {
-            NameKey = nameKey;
+            Title = NameKey = nameKey;
             Order = 0;
             IEMode = IEMode.Edge;
             ParentMenuNameKey = string.Empty;

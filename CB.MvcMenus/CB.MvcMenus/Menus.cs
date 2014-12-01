@@ -145,7 +145,8 @@ namespace CB.MvcMenus
                     IconCSS = controller.Attribute.IconCSS,
                     Name = controller.Attribute.NameKey,
                     IEMode = controller.Attribute.IEMode,
-                    Order = controller.Attribute.Order
+                    Order = controller.Attribute.Order,
+                    Title = controller.Attribute.Title
                 };
                 if (controller.ActionDescriptor != null)
                 {
