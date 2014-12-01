@@ -184,10 +184,10 @@ namespace CB.MvcMenus
 
         public static IEnumerable<MenusProviderMetadata> FindMenuMetadatasByUrl(this IEnumerable<MenusProviderMetadata> allMenus, string url)
         {
-            url = url.ToLowerInvariant();
+            url = (url??string.Empty).ToLowerInvariant();
             foreach (var menu in allMenus)
             {
-                if (menu.ActionUrl.ToLowerInvariant() == url)
+                if ((menu.ActionUrl??string.Empty).ToLowerInvariant() == url)
                 {
                     yield return menu;
                 }
