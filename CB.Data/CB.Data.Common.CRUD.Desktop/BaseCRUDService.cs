@@ -222,8 +222,9 @@ namespace CB.Data.Common.CRUD
 
         public virtual IQueryable<T> Query()
         {
-            CheckAccess(CRUDAction.Query, (IQueryable<T>)null);
-            return DoQuery();
+            var result = DoQuery();
+            CheckAccess(CRUDAction.Query, result);
+            return result;
         }
 
         #endregion
