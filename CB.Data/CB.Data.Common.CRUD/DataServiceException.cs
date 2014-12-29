@@ -10,6 +10,7 @@ namespace CB.Data.Common.CRUD
         public const int DUPLICATED_UNIQUE_FIELDS = 1;
         public const int DUPLICATED_ENTITY = 2;
         public const int ENTITY_OF_FK_NOT_FOUND = 3;
+        public const int ENTITY_NOT_VALID = 4;
 
         public int ErrorCode { get; private set; }
         public static ResourceManager ResourceManager { get; set; }

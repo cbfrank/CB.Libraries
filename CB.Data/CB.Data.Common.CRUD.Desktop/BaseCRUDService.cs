@@ -165,24 +165,37 @@ namespace CB.Data.Common.CRUD
         }
 
         /// <summary>
+        /// this function will check all entities in entitiesToBeChecked can be queried, this function be used mainly in ValidationAsync(IQueryable<T> entities, CRUDAction action)
+        /// to ensure the entities is valid.
+        /// </summary>
+        /// <param name="entitiesToBeChecked"></param>
+        /// <returns></returns>
+        protected abstract Task<bool> CheckQueryableResultValidAsync(IQueryable<T> entitiesToBeChecked);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="action"></param>
         /// <returns>result is the error codes array</returns>
-        protected virtual Task<ValidationResult<T>> ValidationAsync(IQueryable<T> entities, CRUDAction action)
+        protected async virtual Task<ValidationResult<T>> ValidationAsync(IQueryable<T> entities, CRUDAction action)
         {
             if (action == CRUDAction.Create || action == CRUDAction.Update)
             {
                 throw new NotSupportedException();
             }
+            //make sure all entities are can be queryable
+            if (!await CheckQueryableResultValidAsync(entities))
+            {
+                throw new DataServiceException(DataServiceException.ENTITY_NOT_VALID);
+            }
             CheckAccess(action, entities);
-            return Task.FromResult(new ValidationResult<T>());
+            return new ValidationResult<T>();
         }
 
         public async Task<T> GetEntityByKeyAsync(TKey key, bool tracking)
         {
-            var q = Query().Where(GetEntityIdCompareExpression(key));
+            var q = DoQuery().Where(GetEntityIdCompareExpression(key));
             if (!tracking)
             {
                 q = q.AsNoTracking();
