@@ -55,7 +55,6 @@
     <Compile Include="BaseCRUDService.cs" />
     <Compile Include="BaseCRUDServiceForIdKeyEntity.cs" />
     <Compile Include="BaseCRUDServiceSetInActiveForDelete.cs" />
-    <Compile Include="IIdKeyEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

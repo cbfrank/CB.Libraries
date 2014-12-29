@@ -44,6 +44,7 @@
     <Compile Include="ICreateService.cs" />
     <Compile Include="ICRUDService.cs" />
     <Compile Include="IDeleteService.cs" />
+    <Compile Include="IIdKeyEntity.cs" />
     <Compile Include="IQueryableService.cs" />
     <Compile Include="IUpdateService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
