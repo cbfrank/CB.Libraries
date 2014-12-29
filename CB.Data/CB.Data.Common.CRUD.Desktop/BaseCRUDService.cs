@@ -200,6 +200,8 @@ namespace CB.Data.Common.CRUD
             await Database.SaveChangesAsync();
         }
 
+        protected abstract IQueryable<T> DoQuery();
+
         #region Overrides of BaseService
 
         protected virtual void Dispose(bool disposing)
@@ -218,7 +220,11 @@ namespace CB.Data.Common.CRUD
 
         #region Implementation of IQueryableService<out T>
 
-        public abstract IQueryable<T> Query();
+        public virtual IQueryable<T> Query()
+        {
+            CheckAccess(CRUDAction.Query, (IQueryable<T>)null);
+            return DoQuery();
+        }
 
         #endregion
 
