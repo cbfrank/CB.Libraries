@@ -24,7 +24,14 @@ namespace CB.Data.Common.CRUD
             _EntityKeyFunction = new WeakReference<Func<T, TKey>>(null, false);
             EntityKeyExpression = null;
             Database = database;
+            SaveImmediately = true;
         }
+
+        /// <summary>
+        /// indicate if save immediately in the function Create/Update/Delete
+        /// default is true
+        /// </summary>
+        protected bool SaveImmediately { get; set; }
 
         /// <summary>
         /// expression that return the Id property of entity
@@ -252,7 +259,10 @@ namespace CB.Data.Common.CRUD
             {
                 entity = await PreCRUDAction(entity, validationResult.ExistingEntity, CRUDAction.Create);
                 entity = CorrespondingDbSet.Add(entity);
-                await SaveChangesAsync();
+                if (SaveImmediately)
+                {
+                    await SaveChangesAsync();
+                }
                 entity = await PostCRUDAction(entity, CRUDAction.Create);
                 trans.Complete();
             }
@@ -279,7 +289,10 @@ namespace CB.Data.Common.CRUD
                 {
                     Database.Entry(validationResult.ExistingEntity).State = EntityState.Modified;
                 }
-                await SaveChangesAsync();
+                if (SaveImmediately)
+                {
+                    await SaveChangesAsync();
+                }
                 validationResult.ExistingEntity = await PostCRUDAction(validationResult.ExistingEntity, CRUDAction.Update);
                 trans.Complete();
             }
@@ -303,7 +316,10 @@ namespace CB.Data.Common.CRUD
             {
                 entity = await PreCRUDAction(entity, validationResult.ExistingEntity, CRUDAction.Delete);
                 Database.Set<T>().Remove(entity);
-                await SaveChangesAsync();
+                if (SaveImmediately)
+                {
+                    await SaveChangesAsync();
+                }
                 await PostCRUDAction(entity, CRUDAction.Delete);
                 trans.Complete();
             }
@@ -316,6 +332,10 @@ namespace CB.Data.Common.CRUD
             using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 toBeDeleted = await PreCRUDAction(toBeDeleted, CRUDAction.Delete);
+                if (!SaveImmediately)
+                {
+                    throw new NotSupportedException("Delete a query with SaveImmediately of false is not supported");
+                }
                 await toBeDeleted.DeleteAsync();
                 trans.Complete();
             }
