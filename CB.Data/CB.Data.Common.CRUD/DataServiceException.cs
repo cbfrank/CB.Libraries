@@ -49,7 +49,7 @@ namespace CB.Data.Common.CRUD
         public static string ErrorCodeResourceKeyFormatNegative = "ErrorCode_{0}";
         public static string ErrorCodeResourceKeyFormat = "ErrorCode{0}";
 
-        private static string TranslateToMessage(int errorCode, params string[] messageParams)
+        public static string TranslateToMessage(int errorCode, params string[] messageParams)
         {
             var resourceKey = errorCode < 0 ? string.Format(ErrorCodeResourceKeyFormatNegative, Math.Abs(errorCode)) : string.Format(ErrorCodeResourceKeyFormat, errorCode);
             var res = ResourceManager == null ? string.Empty : ResourceManager.GetString(resourceKey);
