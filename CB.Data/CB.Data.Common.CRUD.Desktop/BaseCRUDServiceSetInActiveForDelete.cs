@@ -20,6 +20,15 @@ namespace CB.Data.Common.CRUD
             _SetEntityActiveAction = new WeakReference<Action<T, bool>>(null, false);
         }
 
+        private Action<T, bool> CompileSetEntityIsActiveAction()
+        {
+            var paramEntity = Expression.Parameter(typeof(T));
+            var paramValue = Expression.Parameter(typeof(bool));
+            var prop = (MemberExpression)EntityActivePropertyExpression.Body;
+            var getProp = Expression.Property(paramEntity, (PropertyInfo)prop.Member);
+            return Expression.Lambda<Action<T, bool>>(Expression.Assign(getProp, paramValue), paramEntity, paramValue).Compile();
+        }
+
         public Expression<Func<T, bool>> EntityActivePropertyExpression
         {
             get { return _EntityActivePropertyExpression; }
@@ -34,11 +43,7 @@ namespace CB.Data.Common.CRUD
                     }
                     else
                     {
-                        var paramEntity = Expression.Parameter(typeof (T));
-                        var paramValue = Expression.Parameter(typeof (bool));
-                        var prop = (MemberExpression) _EntityActivePropertyExpression.Body;
-                        var getProp = Expression.Property(paramEntity, (PropertyInfo) prop.Member);
-                        _SetEntityActiveAction.SetTarget(Expression.Lambda<Action<T, bool>>(Expression.Assign(getProp, paramValue), paramEntity, paramValue).Compile());
+                        _SetEntityActiveAction.SetTarget(CompileSetEntityIsActiveAction());
                     }
                 }
             }
@@ -52,6 +57,14 @@ namespace CB.Data.Common.CRUD
                 if (_SetEntityActiveAction.TryGetTarget(out action))
                 {
                     return action;
+                }
+                else
+                {
+                    _SetEntityActiveAction.SetTarget(CompileSetEntityIsActiveAction());
+                    if (_SetEntityActiveAction.TryGetTarget(out action))
+                    {
+                        return action;
+                    }
                 }
                 return null;
             }

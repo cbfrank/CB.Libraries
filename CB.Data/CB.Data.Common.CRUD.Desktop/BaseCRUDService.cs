@@ -68,6 +68,14 @@ namespace CB.Data.Common.CRUD
                 {
                     return func;
                 }
+                else
+                {
+                    _EntityKeyFunction.SetTarget(_EntityKeyExpression.Compile());
+                    if (_EntityKeyFunction.TryGetTarget(out func))
+                    {
+                        return func;
+                    }
+                }
                 return null;
             }
         }
