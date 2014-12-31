@@ -190,3 +190,4 @@ ModelManifest.xml
 CB.MvcMenus/packages/
 CB.Data/packages/
 *.csproj.DotSettings
+WinADFSAuthenticationWithAspNetIdentity/packages/
