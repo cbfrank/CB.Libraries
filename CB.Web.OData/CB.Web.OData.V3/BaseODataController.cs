@@ -22,7 +22,7 @@ namespace CB.Web.OData
             DisposeService = true;
         }
 
-        protected bool DisposeService { get; private set; }
+        protected bool DisposeService { get; set; }
 
         [Dependency]
         public ICRUDService<T, TKey> Service { get; set; }
