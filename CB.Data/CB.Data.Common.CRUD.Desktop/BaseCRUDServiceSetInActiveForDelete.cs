@@ -80,15 +80,35 @@ namespace CB.Data.Common.CRUD
             return await base.CreateAsync(entity);
         }
 
+        protected virtual async Task<bool> ShouldDeletePermanentlyAsync(T entity)
+        {
+            return await Task.FromResult(false);
+        }
+
+        protected virtual async Task<bool> ShouldDeletePermanentlyAsync(IQueryable<T> toBeDeleted)
+        {
+            return await Task.FromResult(false);
+        }
+
         public override async Task DeleteAsync(TKey key)
         {
             var entity = await GetEntityByKeyAsync(key, true);
+            if (await ShouldDeletePermanentlyAsync(entity))
+            {
+                await base.DeleteAsync(key);
+                return;
+            }
             SetEntityIsActiveAction(entity, false);
             await UpdateAsync(entity);
         }
 
-        public override Task DeleteAsync(IQueryable<T> toBeDeleted)
+        public override async Task DeleteAsync(IQueryable<T> toBeDeleted)
         {
+            if (await ShouldDeletePermanentlyAsync(toBeDeleted))
+            {
+                await base.DeleteAsync(toBeDeleted);
+                return;
+            }
             throw new NotImplementedException();
         }
     }
