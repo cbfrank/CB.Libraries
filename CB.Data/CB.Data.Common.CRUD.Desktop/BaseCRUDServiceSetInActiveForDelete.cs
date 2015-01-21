@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace CB.Data.Common.CRUD
 {
@@ -18,6 +19,13 @@ namespace CB.Data.Common.CRUD
         protected BaseCRUDServiceSetInActiveForDelete(TDbContext database) : base(database)
         {
             _SetEntityActiveAction = new WeakReference<Action<T, bool>>(null, false);
+        }
+
+        protected abstract IQueryable<T> DoQueryWithoutActiveCheck();
+
+        protected override IQueryable<T> DoQuery()
+        {
+            return DoQueryWithoutActiveCheck().Where(EntityActivePropertyExpression);
         }
 
         private Action<T, bool> CompileSetEntityIsActiveAction()
@@ -70,12 +78,28 @@ namespace CB.Data.Common.CRUD
             }
         }
 
+        protected virtual async Task ActiveDeletedEntityAsync(TKey key)
+        {
+            var deleted = await DoQueryWithoutActiveCheck().Where(GetEntityIdCompareExpression(key)).FirstOrDefaultAsync();
+            if (deleted == null)
+            {
+                throw new DataServiceException(DataServiceException.ENTITY_NOT_FOUND);
+            }
+            SetEntityIsActiveAction(deleted, true);
+            await Database.SaveChangesAsync();
+        }
+
+        protected abstract Task<bool> IsEntityDeleted(T entity);
+
         public override async Task<T> CreateAsync(T entity)
         {
-            var existing = await FindExistingEntityAsync(entity, false);
-            if (existing != null)
+            if (await IsEntityDeleted(entity))
             {
-                return await UpdateAsync(entity);
+                using (var trans = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    await ActiveDeletedEntityAsync(EntityKeyFunction(entity));
+                    return await UpdateAsync(entity);
+                }
             }
             return await base.CreateAsync(entity);
         }
