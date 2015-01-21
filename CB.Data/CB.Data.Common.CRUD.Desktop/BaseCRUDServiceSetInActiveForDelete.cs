@@ -78,27 +78,20 @@ namespace CB.Data.Common.CRUD
             }
         }
 
-        protected virtual async Task ActiveDeletedEntityAsync(TKey key)
-        {
-            var deleted = await DoQueryWithoutActiveCheck().Where(GetEntityIdCompareExpression(key)).FirstOrDefaultAsync();
-            if (deleted == null)
-            {
-                throw new DataServiceException(DataServiceException.ENTITY_NOT_FOUND);
-            }
-            SetEntityIsActiveAction(deleted, true);
-            await Database.SaveChangesAsync();
-        }
-
-        protected abstract Task<bool> IsEntityDeleted(T entity);
+        protected abstract Task<T> GetDeletedEntityAsync(T entity);
 
         public override async Task<T> CreateAsync(T entity)
         {
-            if (await IsEntityDeleted(entity))
+            var deleted = await GetDeletedEntityAsync(entity);
+            if (deleted != null)
             {
                 using (var trans = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    await ActiveDeletedEntityAsync(EntityKeyFunction(entity));
-                    return await UpdateAsync(entity);
+                    SetEntityIsActiveAction(deleted, true);
+                    await Database.SaveChangesAsync();
+                    var updated = await UpdateAsync(entity);
+                    trans.Complete();
+                    return updated;
                 }
             }
             return await base.CreateAsync(entity);
