@@ -3,6 +3,8 @@
     public enum IEMode
     {
         Edge,
-        IE8
+        IE8,
+        IE9,
+        IE10
     }
 }
