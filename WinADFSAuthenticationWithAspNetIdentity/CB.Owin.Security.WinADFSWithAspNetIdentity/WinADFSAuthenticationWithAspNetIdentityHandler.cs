@@ -31,7 +31,19 @@ namespace CB.Owin.Security.ADFS
                     {
                         return false;
                     }
-                    Context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                    var unauthorizedContent = "You are not allowed to be used this web site.";
+                    if (Options.Provider.CustomUnauthorizedContent != null)
+                    {
+                        unauthorizedContent = Options.Provider.CustomUnauthorizedContent(Context);
+                    }
+                    if (string.IsNullOrEmpty(unauthorizedContent))
+                    {
+                        Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    }
+                    else
+                    {
+                        Context.Response.Write(unauthorizedContent);
+                    }
                     return true;
                 }
             }

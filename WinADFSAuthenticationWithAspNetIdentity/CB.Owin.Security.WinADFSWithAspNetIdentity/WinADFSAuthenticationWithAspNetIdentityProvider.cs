@@ -12,5 +12,6 @@ namespace CB.Owin.Security.ADFS
         public Func<ClaimsPrincipal, string> GetLoginProvider { get; set; }
         public Func<IOwinContext, TSignInManager> GetSignInManager { get; set; }
         public Func<IOwinContext, AuthenticationTicket, Task<bool>> OnAuthenticatedAsync { get; set; }
+        public Func<IOwinContext, string> CustomUnauthorizedContent { get; set; }
     }
 }
