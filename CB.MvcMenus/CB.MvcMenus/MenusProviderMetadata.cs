@@ -15,6 +15,10 @@ namespace CB.MvcMenus
         public IEMode IEMode { get; set; }
         internal int Order { get; set; }
         public string Title { get; set; }
+        /// <summary>
+        /// if true, then it will not be shown if it has no children menus
+        /// </summary>
+        public bool HideIfNoChildren { get; set; }
 
         public List<MenusProviderMetadata> ChildrenMenus { get; private set; }
     }

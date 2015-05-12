@@ -146,7 +146,8 @@ namespace CB.MvcMenus
                     Name = controller.Attribute.NameKey,
                     IEMode = controller.Attribute.IEMode,
                     Order = controller.Attribute.Order,
-                    Title = controller.Attribute.Title
+                    Title = controller.Attribute.Title,
+                    HideIfNoChildren = controller.Attribute.HideIfNoChildren
                 };
                 if (controller.ActionDescriptor != null)
                 {

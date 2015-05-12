@@ -14,6 +14,8 @@ namespace CB.MvcMenus
         public int Order { get; set; }
         public IEMode IEMode { get; set; }
 
+        public bool HideIfNoChildren { get; set; }
+
         /// <summary>
         /// if provide, then the values will be passed to the action of controller
         /// </summary>
@@ -28,6 +30,7 @@ namespace CB.MvcMenus
             IEMode = IEMode.Edge;
             ParentMenuNameKey = string.Empty;
             ((IMenuInformation) this).ActionRouteValues = null;
+            HideIfNoChildren = false;
         }
     }
 }
