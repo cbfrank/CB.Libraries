@@ -154,6 +154,10 @@ namespace CB.MvcMenus
                     metadata.ActionUrl = urlHelper.Action(controller.ActionDescriptor.ActionName,
                         controller.ControllerDescriptor.ControllerName, controller.Attribute.ActionRouteValues);
                 }
+                if (controller.Attribute.ParentMenuNameKey == null)
+                {
+                    controller.Attribute.ParentMenuNameKey = string.Empty;
+                }
                 if (!groupsMenus.ContainsKey(controller.Attribute.ParentMenuNameKey))
                 {
                     groupsMenus[controller.Attribute.ParentMenuNameKey] = new List<MenusProviderMetadata>();
