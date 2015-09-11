@@ -12,7 +12,7 @@ namespace CB.Owin.Security.ADFS
             ExpireTimeSpan = new TimeSpan(1, 0, 0);
             SignInPersistent = false;
             RememberBrowser = false;
-            SignInAgainWhenOnlyWinADFSAuthenticationWithAspNetIdentityAuthenticationType = true;
+            //SignInAgainWhenOnlyWinADFSAuthenticationWithAspNetIdentityAuthenticationType = true;
             Provider = new WinADFSAuthenticationWithAspNetIdentityProvider<TSignInManager>();
         }
 
@@ -40,7 +40,7 @@ namespace CB.Owin.Security.ADFS
         /// this case can be the SignInPersistent is set to true and user close browser and open again, then the authention get from cookie and windows authention or ADFS won't happen
         /// defualt is true
         /// </summary>
-        public bool SignInAgainWhenOnlyWinADFSAuthenticationWithAspNetIdentityAuthenticationType { get; set; }
+        //public bool SignInAgainWhenOnlyWinADFSAuthenticationWithAspNetIdentityAuthenticationType { get; set; }
         public bool RememberBrowser { get; set; }
         public IWinADFSAuthenticationWithAspNetIdentityProvider<TSignInManager> Provider { get; set; }
     }

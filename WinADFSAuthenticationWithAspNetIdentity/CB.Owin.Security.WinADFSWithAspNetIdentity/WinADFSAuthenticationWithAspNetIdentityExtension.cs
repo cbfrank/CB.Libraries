@@ -16,22 +16,22 @@ namespace CB.Owin.Security.ADFS
             where TKey : IEquatable<TKey>, IConvertible
             where TSignInManager : SignInManager<TUser, TKey>
         {
-            var cookieOptions = new CookieAuthenticationOptions
-            {
-                AuthenticationType = options.AuthenticationType,
-                AuthenticationMode = AuthenticationMode.Active,
-                CookieName = ".AspNet." + options.AuthenticationType,
-                ExpireTimeSpan = options.ExpireTimeSpan,
-                Provider = new CookieAuthenticationProvider
-                {
-                    //        // Enables the application to validate the security stamp when the user logs in.
-                    //        // This is a security feature which is used when you change a password or add an external login to your account.  
-                    OnValidateIdentity = context => SecurityStampValidator.OnValidateIdentity<TUserManager, TUser, TKey>(
-                        TimeSpan.FromMinutes(30), (manager, user) => manager.CreateIdentityAsync(user, options.AuthenticationType),
-                        identity => identity.GetUserId<TKey>())(context)
-                }
-            };
-            app.UseCookieAuthentication(cookieOptions);
+            //var cookieOptions = new CookieAuthenticationOptions
+            //{
+            //    AuthenticationType = options.AuthenticationType,
+            //    AuthenticationMode = AuthenticationMode.Active,
+            //    CookieName = ".AspNet." + options.AuthenticationType,
+            //    ExpireTimeSpan = options.ExpireTimeSpan,
+            //    Provider = new CookieAuthenticationProvider
+            //    {
+            //        //        // Enables the application to validate the security stamp when the user logs in.
+            //        //        // This is a security feature which is used when you change a password or add an external login to your account.  
+            //        OnValidateIdentity = context => SecurityStampValidator.OnValidateIdentity<TUserManager, TUser, TKey>(
+            //            TimeSpan.FromMinutes(30), (manager, user) => manager.CreateIdentityAsync(user, options.AuthenticationType),
+            //            identity => identity.GetUserId<TKey>())(context)
+            //    }
+            //};
+            //app.UseCookieAuthentication(cookieOptions);
 
             if (app == null)
                 throw new ArgumentNullException("app");

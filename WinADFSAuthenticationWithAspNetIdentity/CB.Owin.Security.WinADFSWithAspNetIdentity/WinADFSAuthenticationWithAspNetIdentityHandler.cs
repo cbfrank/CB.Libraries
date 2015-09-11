@@ -47,14 +47,14 @@ namespace CB.Owin.Security.ADFS
                     return true;
                 }
             }
-            else if (Options.SignInAgainWhenOnlyWinADFSAuthenticationWithAspNetIdentityAuthenticationType &&
-                     Context.Authentication.User.Identities.All(i => i.AuthenticationType == Options.AuthenticationType))
-            {
-                //if only have ECO_AUTHENTICATION_TYPE, then mean the coolie is still valid, so the authentication get it directly, and windows / ADFS won't be called
-                //so we have to force user logout of the ECO_AUTHENTICATION_TYPE and force them to refresh
-                Context.Authentication.SignOut(Options.AuthenticationType);
-                Context.Response.Redirect(Context.Request.Path.ToString());
-            }
+            //else if (Options.SignInAgainWhenOnlyWinADFSAuthenticationWithAspNetIdentityAuthenticationType &&
+            //         Context.Authentication.User.Identities.All(i => i.AuthenticationType == Options.AuthenticationType))
+            //{
+            //    //if only have ECO_AUTHENTICATION_TYPE, then mean the coolie is still valid, so the authentication get it directly, and windows / ADFS won't be called
+            //    //so we have to force user logout of the ECO_AUTHENTICATION_TYPE and force them to refresh
+            //    Context.Authentication.SignOut(Options.AuthenticationType);
+            //    Context.Response.Redirect(Context.Request.Path.ToString());
+            //}
             return false;
         }
 
