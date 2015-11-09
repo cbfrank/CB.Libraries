@@ -60,8 +60,11 @@ namespace CB.AspNet.Authentication.QQ
 #if DEVTEST
         private string GetTestRedirectUriForDebug(string originalRedirectUri)
         {
+            if (string.IsNullOrEmpty(Options.CallbackFullPathForDebug))
+            {
+                return originalRedirectUri;
+            }
             return Options.CallbackFullPathForDebug;
-            //return originalRedirectUri;
         }
 #endif
 
@@ -146,21 +149,14 @@ namespace CB.AspNet.Authentication.QQ
         {
             var response = await Backchannel.SendAsync(message, Context.RequestAborted);
             response.EnsureSuccessStatusCode();
-            var form = new FormCollection(FormReader.ReadForm(await response.Content.ReadAsStringAsync()));
-            var properties = new object[form.Keys.Count];
-            var index = 0;
-            foreach (var item in form)
-            {
-                properties[index] = new JProperty(item.Key, item.Value[0]);
-                index++;
-            }
-            return new JObject(properties);
+            return QQHelper.ConvertFormFormatStrToJson(await response.Content.ReadAsStringAsync());
         }
 
         /// <summary>
         /// send http request message and read result as JObject
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="callbackFormat">if true, the result is a json content but in "callback(json result)"</param>
         /// <returns></returns>
         private async Task<JObject> CallJsonAsync(HttpRequestMessage message, bool callbackFormat)
         {
