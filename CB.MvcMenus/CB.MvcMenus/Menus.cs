@@ -226,16 +226,16 @@ namespace CB.MvcMenus
             }
         }
 
-        private static string RenderMenu(MenusProviderMetadata menu,
-            Func<MenusProviderMetadata, string> generateMenuFunc)
+        private static string RenderMenu(MenusProviderMetadata menu, int menuLevel,
+            Func<MenusProviderMetadata, int, string> generateMenuFunc)
         {
-            var menuHtml = generateMenuFunc(menu);
+            var menuHtml = generateMenuFunc(menu, menuLevel);
             var children = new StringBuilder();
             if (menu.ChildrenMenus.Count > 0)
             {
                 foreach (var childMenu in menu.ChildrenMenus)
                 {
-                    children.AppendLine(RenderMenu(childMenu, generateMenuFunc));
+                    children.AppendLine(RenderMenu(childMenu, menuLevel + 1, generateMenuFunc));
                 }
             }
             var childrenStr = string.Empty;
@@ -250,15 +250,15 @@ namespace CB.MvcMenus
         /// 
         /// </summary>
         /// <param name="page"></param>
-        /// <param name="generateMenuFunc">return the menu html string, {0} in the string will be replaced with the html string of children menus</param>
-        public static HelperResult RenderMenus(this WebViewPage page, Func<MenusProviderMetadata, string> generateMenuFunc)
+        /// <param name="generateMenuFunc">return the menu html string, the second int param indicate the level of current menu metadata, 0 is root,  {0} in the result string will be replaced with the html string of children menus</param>
+        public static HelperResult RenderMenus(this WebViewPage page, Func<MenusProviderMetadata, int, string> generateMenuFunc)
         {
             return new HelperResult(tw =>
             {
                 var menus = GetAllMenuMetadatas(page.ViewContext, page.Url);
                 foreach (var menu in menus)
                 {
-                    tw.Write(new HtmlString(RenderMenu(menu, generateMenuFunc)));
+                    tw.Write(new HtmlString(RenderMenu(menu, 0, generateMenuFunc)));
                 }
             });
         }
