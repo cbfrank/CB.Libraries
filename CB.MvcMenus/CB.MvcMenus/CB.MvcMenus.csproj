@@ -88,6 +88,7 @@
     <Compile Include="MenusCodeProviderAttribute.cs" />
     <Compile Include="MenusProviderAttribute.cs" />
     <Compile Include="MenusProviderControllerInfo.cs" />
+    <Compile Include="MenusProviderDirectLinkInfo.cs" />
     <Compile Include="MenusProviderMetadata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

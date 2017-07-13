@@ -103,6 +103,11 @@ namespace CB.MvcMenus
             GetFunctionsProviderControllerInfosOfRequest(context).Add(new MenusProviderControllerInfo(typeof(TController), method, menuInformation));
         }
 
+        public static void AddMenuInfo(IMenuInformation menuInformation, string menuLinkUrl)
+        {
+            _FunctionsProviderControllerInfos.Add(new MenusProviderDirectLinkInfo(menuInformation, menuLinkUrl));
+        }
+
         /// <summary>
         /// get not only static global menus, but also get the menus registed for one request
         /// </summary>
@@ -116,10 +121,11 @@ namespace CB.MvcMenus
             foreach (var controller in _FunctionsProviderControllerInfos.Union(GetFunctionsProviderControllerInfosOfRequest(HttpContext.Current.GetOwinContext())))
             {
                 var authorized = true;
+                var actionUrl = controller.GetMenuUrl(urlHelper);
 
                 #region If Define MvcAuthorizeAttribute on Method or Controller, check if current user has the access
 
-                if (controller.ActionDescriptor == null) //this is a parent menu, because only parent menu can marked on Controller, so for parent menu, we let it always authorized
+                if (string.IsNullOrEmpty(actionUrl) || controller.ActionDescriptor == null) //this is a parent menu, because only parent menu can marked on Controller, so for parent menu, we let it always authorized
                 {
 
                 }
@@ -147,13 +153,9 @@ namespace CB.MvcMenus
                     IEMode = controller.Attribute.IEMode,
                     Order = controller.Attribute.Order,
                     Title = controller.Attribute.Title,
-                    HideIfNoChildren = controller.Attribute.HideIfNoChildren
+                    HideIfNoChildren = controller.Attribute.HideIfNoChildren,
+                    ActionUrl = actionUrl
                 };
-                if (controller.ActionDescriptor != null)
-                {
-                    metadata.ActionUrl = urlHelper.Action(controller.ActionDescriptor.ActionName,
-                        controller.ControllerDescriptor.ControllerName, controller.Attribute.ActionRouteValues);
-                }
                 if (controller.Attribute.ParentMenuNameKey == null)
                 {
                     controller.Attribute.ParentMenuNameKey = string.Empty;

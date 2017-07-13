@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Web.Mvc;
 
 namespace CB.MvcMenus
 {
@@ -10,29 +11,41 @@ namespace CB.MvcMenus
         public MenusProviderControllerInfo(Type controllerType, MethodInfo menuActionMethodInfo, IMenuInformation attribute)
         {
             Attribute = attribute;
-            ControllerType = controllerType;
-            ControllerDescriptor = new System.Web.Mvc.ReflectedControllerDescriptor(controllerType);
-            UnionAuthorizationFilters = new System.Web.Mvc.IAuthorizationFilter[0];
-            if (menuActionMethodInfo != null)
+            //ControllerType = controllerType;
+            if (controllerType != null)
             {
-                ActionDescriptor = new System.Web.Mvc.ReflectedActionDescriptor(menuActionMethodInfo, menuActionMethodInfo.Name, ControllerDescriptor);
-                UnionAuthorizationFilters = ActionDescriptor.GetFilterAttributes(true).OfType<System.Web.Mvc.IAuthorizationFilter>().ToArray();
+                ControllerDescriptor = new ReflectedControllerDescriptor(controllerType);
+            }
+            UnionAuthorizationFilters = new IAuthorizationFilter[0];
+            if (controllerType != null && menuActionMethodInfo != null)
+            {
+                ActionDescriptor = new ReflectedActionDescriptor(menuActionMethodInfo, menuActionMethodInfo.Name, ControllerDescriptor);
+                UnionAuthorizationFilters = ActionDescriptor.GetFilterAttributes(true).OfType<IAuthorizationFilter>().ToArray();
                 if (!UnionAuthorizationFilters.Any())
                 {
-                    UnionAuthorizationFilters = ControllerDescriptor.GetFilterAttributes(true).OfType<System.Web.Mvc.IAuthorizationFilter>().ToArray();
+                    UnionAuthorizationFilters = ControllerDescriptor.GetFilterAttributes(true).OfType<IAuthorizationFilter>().ToArray();
                 }
             }
         }
 
-        public Type ControllerType { get; private set; }
-        public IMenuInformation Attribute { get; private set; }
+        //public Type ControllerType { get; }
+        public IMenuInformation Attribute { get; }
 
-        public System.Web.Mvc.ControllerDescriptor ControllerDescriptor { get; private set; }
-        public System.Web.Mvc.ActionDescriptor ActionDescriptor { get; private set; }
+        protected ControllerDescriptor ControllerDescriptor { get; }
+        public ActionDescriptor ActionDescriptor { get; protected set; }
         
         /// <summary>
         /// the IAuthorizationFilter on action, if there is no, then the IAuthorizationFilter on controller
         /// </summary>
-        public IEnumerable<System.Web.Mvc.IAuthorizationFilter> UnionAuthorizationFilters { get; private set; }
+        public IEnumerable<IAuthorizationFilter> UnionAuthorizationFilters { get; }
+
+        public virtual string GetMenuUrl(UrlHelper urlHelper)
+        {
+            if (ActionDescriptor == null || ControllerDescriptor == null)
+            {
+                return string.Empty;
+            }
+            return urlHelper.Action(ActionDescriptor.ActionName, ControllerDescriptor.ControllerName, Attribute.ActionRouteValues);
+        }
     }
 }
