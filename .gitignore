@@ -192,3 +192,4 @@ CB.Data/packages/
 *.csproj.DotSettings
 WinADFSAuthenticationWithAspNetIdentity/packages/
 CB.Web.OData/packages/
+**/.vs/

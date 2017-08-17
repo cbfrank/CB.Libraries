@@ -103,6 +103,11 @@ namespace CB.MvcMenus
             GetFunctionsProviderControllerInfosOfRequest(context).Add(new MenusProviderControllerInfo(typeof(TController), method, menuInformation));
         }
 
+        public static void AddMenuInfo(this IOwinContext context, IMenuInformation menuInformation, string menuLinkUrl)
+        {
+            GetFunctionsProviderControllerInfosOfRequest(context).Add(new MenusProviderDirectLinkInfo(menuInformation, menuLinkUrl));
+        }
+
         public static void AddMenuInfo(IMenuInformation menuInformation, string menuLinkUrl)
         {
             _FunctionsProviderControllerInfos.Add(new MenusProviderDirectLinkInfo(menuInformation, menuLinkUrl));
